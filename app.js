@@ -10,7 +10,7 @@ app.get("/", function(req, res){
 	res.render("index");
 })
 
-app.get("/:nombre", function(req, res){
+app.get("/form", function(req, res){
 	var nombre = req.params.nombre;
 	console.log(nombre);
 	res.render("form", {name: nombre});
