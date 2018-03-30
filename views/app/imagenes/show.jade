@@ -1,5 +1,8 @@
 extends ../../layout.jade
 block contenido
-	h1= imagen.title
-	if(typeof imagen != "undefined")
-		p Por #{imagen.creator.email}
+	div(class="img-container")
+		h1= imagen.title
+		//No se pone /public/imagenes/nombre.png porque ya tenemos definida la ruta estática public en app.js
+		img(src="/imagenes/#{imagen._id}.#{imagen.extension}" class="main-img")
+		if(typeof imagen != "undefined")
+			p Por #{imagen.creator.email}

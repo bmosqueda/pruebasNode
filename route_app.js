@@ -3,12 +3,19 @@ var express = require('express');
 var Imagen = require('./models/imagenes');
 var router = express.Router();
 
+var fs = require('fs');
+
 var image_finder_middleware = require("./middlewares/find_image");
 
 //El * indica que después de eso puede venir lo que sea, pero
 //todas las funciones con esa firma implementarán este middleware
 router.get("/", function(req, res) {
-	res.render("app/home");
+	Imagen.find({})
+		.populate("creator")
+		.exec(function(err, imagenes) {
+			if(err) console.log(err);
+			res.render("app/home", {imagenes, imagenes});
+		})
 })
 
 router.get("/imagenes/new", function(req, res) {
@@ -56,16 +63,21 @@ router.route("/imagenes")
 		})
 	})
 	.post(function(req, res) {
-		console.log("POST usuarioId: " + res.locals.user._id);
+		var extension = req.files.archivo.name.split(".").pop();
+		//Del formulario en new sacamos el nombre del archivo del control "archivo"
+		console.log("POST imagen: " + req.files.archivo.name)
 		var data = {
 			title: req.body.title,
-			creator: res.locals.user._id
+			creator: res.locals.user._id,
+			extension: extension
 		}
 
 		var imagen = new Imagen(data);
 
 		imagen.save(function(err) {
 			if(!err) {
+				//Cuando sabemos que se guardó bien la imagen procedemos a moverla de la ca´peta temporal en donde se guarda al momento de la subida
+				fs.rename(req.files.archivo.path, "public/imagenes/" + imagen._id + "." + extension );
 				res.redirect("/app/imagenes/" + imagen._id);
 			}
 			else {

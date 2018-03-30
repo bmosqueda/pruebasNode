@@ -3,7 +3,8 @@ block contenido
 	div(class="col-md-8 remove-float center-block text-center big-top-space")
 		h1 Subir nueva imagen
 		br
-		form(action="/app/imagenes" method="POST")
+		//El enctype es para indicar que se van a subir archivos con la petición del formulario
+		form(action="/app/imagenes" method="POST" enctype="multipart/form-data")
 			div(class="form-group")
 				label(for="title") Título
 					input(type="text" id="title" placeholder="Título de la imagen..." name="title" class="form-control")

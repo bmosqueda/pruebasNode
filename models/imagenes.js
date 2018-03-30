@@ -5,7 +5,8 @@ var img_schema = new Schema({
 	title: {type: String, required: true},
 	//El campo llave que le indica a que usuario pertence
 	//Hace referencia al modelo de usuario
-	creator: {type: Schema.Types.ObjectId, ref: "User"}
+	creator: {type: Schema.Types.ObjectId, ref: "User"},
+	extension: {type: String, required: true}
 });
 
 var Imagen = mongoose.model("Imagen", img_schema);

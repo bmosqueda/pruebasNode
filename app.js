@@ -11,6 +11,7 @@ var cookieSession = require('cookie-session')
 var router_app = require("./route_app");
 var session_middleware = require('./middlewares/session');
 
+var formidable = require("express-form-data");
 //database
 var mongoose = require('mongoose');
 
@@ -38,6 +39,15 @@ app.use(cookieSession({
 	name: "session",
 	keys: ["llave-1", "llave-2"]
 }));
+
+//Usar el middleware usado para subir archivos
+/*Crea una carpeta temporal en donde va almacenando las imágenes 
+y con keepExtensions le decimos que mantenga la extensión de las imágenes que suban*/
+/*SOLUCION: formidable.parse() is not a function. tuve este problema y lo solucione con esta 
+libreria npm install --save express-form-data dejan todo igual solo cambial el require de express-formidable 
+por express-form-data y el la info del archivo se almacena en req.files enlugar de req.body es decir al hacer el 
+console.log x ejemplo deben usar console.log(req.files.archivo)﻿*/
+app.use(formidable.parse({keepExtensions: true}));
 
 //to work the view's render
 app.set("view engine", "jade");
