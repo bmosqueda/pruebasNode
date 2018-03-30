@@ -99,9 +99,16 @@ app.post('/sessions', function(req, res) {
 	//por default te devulve todos los campos
 	//fin
 	User.findOne({email: req.body.email, password: req.body.password}, function(err, user) {
-		console.log(user);
-		req.session.user_id = user._id;
-		res.redirect("/app");
+		if(user != null) {
+			console.log(user);
+			req.session.user_id = user._id;
+			res.redirect("/app");	
+		}
+		else
+		{
+			console.log(err);
+			res.send("Usuario o contraseña incorrecta");
+		}
 	})
 });
 

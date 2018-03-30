@@ -51,3 +51,13 @@ nav li a:hover {
 .tr:nth-of-type(odd) {
 	background-color: #D6D6D6FF;
 }
+
+form.link {
+	display: inline-block;
+}
+
+form.link input[type="submit"] {
+	background-color: transparent;
+	border: none;	
+	color: rgb(200,50,50); 
+}
