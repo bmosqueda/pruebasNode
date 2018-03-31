@@ -4,10 +4,19 @@ block contenido
 	h1 HOME
 	p Hola #{user.email}
 	br
-	for imagen in imagenes
+	div(id="imagenes")
+		for imagen in imagenes
+			div(class="img-container")
+				a(href="/app/imagenes/#{imagen._id}")
+					h2= imagen.title
+				//No se pone /public/imagenes/nombre.png porque ya tenemos definida la ruta estática public en app.js
+				img(src="/imagenes/#{imagen._id}.#{imagen.extension}" class="main-img")
+				if(typeof imagen != "undefined")
+					p Por #{imagen.creator.email}
+	//Lo va a ignorar el navagador y será usado sólo internamente para agreagar las imágenes en tiempo real. Recibirá un Json con la información de la imagen desde client.js
+	script(id="image-template" type="text/x-handlebars-template")
 		div(class="img-container")
-			h2= imagen.title
-			//No se pone /public/imagenes/nombre.png porque ya tenemos definida la ruta estática public en app.js
-			img(src="/imagenes/#{imagen._id}.#{imagen.extension}" class="main-img")
-			if(typeof imagen != "undefined")
-				p Por #{imagen.creator.email}
+			a(href="/app/imagenes/{{id}}")
+			h2 {{title}}
+			img(src="/imagenes/{{id}}.{{extension}}" class="main-img")
+	script(src="/js/client.js")

@@ -6,18 +6,36 @@ var app = express();
 var User = require('./models/user').User;
 var methodOverride = require('method-override');
 //Para manejar las sesiones iniciadas
-// var session = require('express-session')
-var cookieSession = require('cookie-session')
+var session = require('express-session');
+
+//Para poder pasar como argumento nuestro servidor
+var http = require('http');
+var server = http.Server(app);
+var realtime = require('./realtime');
+// var cookieSession = require('cookie-session')	//Guardar las sessiones en las cookies locales
 var router_app = require("./route_app");
 var session_middleware = require('./middlewares/session');
 
 var formidable = require("express-form-data");
 //database
 var mongoose = require('mongoose');
-
+var RedisStore = require("connect-redis")(session);//Se le pasa como parámetro el manejador de la sesión
 //middleware para que se pueda acceder a el contenido de esta carpeta
-app.use(/*'estatico',*/express.static('public'));
+//Manejo de sesiones con Redis
+//Nada que ver con el otro session_middleare 
+var sessionMiddleware = session({
+	//se envían como parámetros el puerto y el password para conectarse con Redis
+	//Pero como se manejan valores por default no se pasa nada
+	store: new RedisStore({}),
+	//Para encriptar la información
+	secret: "super ultra secret word"
+})
 
+app.use(sessionMiddleware);
+
+realtime(server, sessionMiddleware);
+
+app.use(/*'estatico',*/express.static('public'));
 app.use(bodyParser.json()); //Para peticiones aplication/json
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
@@ -35,10 +53,10 @@ app.use(methodOverride("_method"));
 
 //Manejo de sessiones con cookies en el cliente
 //Aunque el servidor se reinicie se conserva la información de la sesión
-app.use(cookieSession({
-	name: "session",
-	keys: ["llave-1", "llave-2"]
-}));
+// app.use(cookieSession({
+// 	name: "session",
+// 	keys: ["llave-1", "llave-2"]
+// }));
 
 //Usar el middleware usado para subir archivos
 /*Crea una carpeta temporal en donde va almacenando las imágenes 
@@ -125,5 +143,6 @@ app.post('/sessions', function(req, res) {
 app.use("/app", session_middleware);
 app.use("/app", router_app);
 
-app.listen(8080);
+//Que sea el servidor el que reciba las peticiones ( que es una instancia de http) y no express
+server.listen(8080);
 

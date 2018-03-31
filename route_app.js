@@ -4,6 +4,9 @@ var Imagen = require('./models/imagenes');
 var router = express.Router();
 
 var fs = require('fs');
+var redis = require('redis');
+
+var client = redis.createClient();
 
 var image_finder_middleware = require("./middlewares/find_image");
 
@@ -76,6 +79,15 @@ router.route("/imagenes")
 
 		imagen.save(function(err) {
 			if(!err) {
+
+				var imgJSON = {
+					"id": imagen._id,
+					"title": imagen.title,
+					"extension": imagen.extension
+				};
+
+				//Para publicar las imágenes con socket.io y los demás puedan actulizar en tiempo real
+				client.publish("images", JSON.stringify(imgJSON));
 				//Cuando sabemos que se guardó bien la imagen procedemos a moverla de la ca´peta temporal en donde se guarda al momento de la subida
 				fs.rename(req.files.archivo.path, "public/imagenes/" + imagen._id + "." + extension );
 				res.redirect("/app/imagenes/" + imagen._id);
